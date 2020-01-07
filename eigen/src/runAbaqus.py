@@ -116,7 +116,7 @@ def makeJob():
 		scratch='', type=ANALYSIS, userSubroutine='', waitHours=0, waitMinutes=0)
 
 def submitJob():
-    mdb.saveAs("drumEigen.cae")
+	mdb.saveAs("drumEigen.cae")
 	mdb.jobs['drumEigen'].submit(consistencyChecking=OFF)
 
 if __name__ == "__main__":
