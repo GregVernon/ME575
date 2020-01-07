@@ -1,6 +1,6 @@
 Opt.nDOF = 4;
 Opt.nChildren = 4;
-Opt.diffWeight = 0.8;
+% Opt.diffWeight = 0.8;
 Opt.crossProb = 0.95;
 
 main(Opt);
@@ -42,25 +42,34 @@ nDOF = Opt.nDOF;
 
 parentIDS = 1:nChildren;
 for ii = 1:nChildren
-    % Pick three distinct parents
-    availParents = true(nChildren,1);
-    availParents(ii) = false;
-    availParents = parentIDS(availParents);
-    pID = availParents(randperm(nChildren-1,3));
-    
-    % Evaluate differential evolution
-    A = Parent(pID(1)).x;
-    B = Parent(pID(2)).x;
-    C = Parent(pID(3)).x;
-    for n = 1:nDOF
-        Child(ii).x(n,:) = A(n,:) + Opt.diffWeight * (B(n,:) - C(n,:));
-    end
-    
-    % Evaluate crossover
-    for n = 1:nDOF
-        r = rand();
-        if r >= Opt.crossProb
-            Child(ii).x(n,:) = Parent(ii).x(n,:);
+    isValid = false;
+    while isValid == false
+        F = rand + 0.5;
+        % Pick three distinct parents
+        availParents = true(nChildren,1);
+        availParents(ii) = false;
+        availParents = parentIDS(availParents);
+        pID = availParents(randperm(nChildren-1,3));
+
+        % Evaluate differential evolution
+        A = Parent(pID(1)).x;
+        B = Parent(pID(2)).x;
+        C = Parent(pID(3)).x;
+        for n = 1:nDOF
+            Child(ii).x(n,:) = A(n,:) + F * (B(n,:) - C(n,:));
+        end
+
+        % Evaluate crossover
+        for n = 1:nDOF
+            r = rand();
+            if r >= Opt.crossProb
+                Child(ii).x(n,:) = Parent(ii).x(n,:);
+            end
+        end
+        
+        radius = sqrt(Child(ii).x(:,1).^2 + Child(ii).x(:,2).^2);
+        if all(radius <= 0.975)
+            isValid = true;
         end
     end
 end
