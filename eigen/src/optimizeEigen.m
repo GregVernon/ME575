@@ -9,9 +9,10 @@ Parent = main(Opt);
 function Parent = main(Opt)
 for g = 1:100
     disp("Generation: " + num2str(g))
-    
+    Opt.generation = g;
     if g == 1
         Parent = initialize(Opt);
+        Child = Parent;
     else
         Child = createNextGeneration(Opt,Parent);
         f = zeros(Opt.nChildren,1);
@@ -23,7 +24,22 @@ for g = 1:100
         
         Parent = tournament(Parent,Child);
     end
+    writeOutput(Opt,Parent,Child);
 end
+end
+
+%%%%%%%%%%%
+
+function writeOutput(Opt,Parent, Child)
+if Opt.generation == 1
+    save("drumEigen_results.mat",'-v7.3',"Child","Opt","Parent");
+else
+    m = matfile("drumEigen_results.mat",'Writable',true);
+    m.Opt = Opt;
+    m.Parent = Parent;
+    m.Child = [m.Child; Child];
+end
+
 end
 
 %%%%%%%%%%%
@@ -44,6 +60,8 @@ nDOF = Opt.nDOF;
 
 parentIDS = 1:nChildren;
 for ii = 1:nChildren
+    Child(ii).generation = Opt.generation;
+    Child(ii).individual = ii;
     isValid = false;
     while isValid == false
         F = rand + 0.5;
@@ -106,6 +124,8 @@ end
 for ii = 1:nChildren
     Parent(ii).x = x{ii};
     Parent(ii).objVal = f(ii);
+    Parent(ii).generation = Opt.generation;
+    Parent(ii).individual = ii;
 end
 end
 
