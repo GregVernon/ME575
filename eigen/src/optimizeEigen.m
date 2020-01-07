@@ -7,20 +7,22 @@ Parent = main(Opt);
 
 %% Helper Functions
 function Parent = main(Opt)
-Parent = initialize(Opt);
-
 for g = 1:100
     disp("Generation: " + num2str(g))
-    Child = createNextGeneration(Opt,Parent);
     
-    f = zeros(Opt.nChildren,1);
-    for c = 1:Opt.nChildren
-        disp("Evaluating function: " + num2str(c))
-        f(c) = functionEvaluation(Child(c).x);
-        Child(c).objVal = f(c);
+    if g == 1
+        Parent = initialize(Opt);
+    else
+        Child = createNextGeneration(Opt,Parent);
+        f = zeros(Opt.nChildren,1);
+        for c = 1:Opt.nChildren
+            disp("Evaluating function: " + num2str(c))
+            f(c) = functionEvaluation(Child(c).x);
+            Child(c).objVal = f(c);
+        end
+        
+        Parent = tournament(Parent,Child);
     end
-    
-    Parent = tournament(Parent,Child);
 end
 end
 
@@ -50,7 +52,7 @@ for ii = 1:nChildren
         availParents(ii) = false;
         availParents = parentIDS(availParents);
         pID = availParents(randperm(nChildren-1,3));
-
+        
         % Evaluate differential evolution
         A = Parent(pID(1)).x;
         B = Parent(pID(2)).x;
@@ -58,7 +60,7 @@ for ii = 1:nChildren
         for n = 1:nDOF
             Child(ii).x(n,:) = A(n,:) + F * (B(n,:) - C(n,:));
         end
-
+        
         % Evaluate crossover
         for n = 1:nDOF
             r = rand();
