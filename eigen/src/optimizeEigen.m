@@ -119,7 +119,7 @@ csvwrite(fName,x);
 %% Create Mesh in Cubit
 command = string(['"' cubPath 'claro.exe" -nobanner -nographics -nojournal -noecho -information off -batch runCubit.py']);
 command = strjoin(command);
-system(command);
+[~,~] = system(command);
 
 %% Run Abaqus Simulation
 % command = string(['"C:/Program Files\SIMULIA\Commands\abaqus.bat" cae noGUI=C:\Users\gregj\Documents\GitHub\ME575\eigen\src\runAbaqus.py -- ', num2str(x), " ", num2str(y)]);
