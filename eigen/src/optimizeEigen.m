@@ -3,10 +3,10 @@ Opt.nChildren = 4;
 % Opt.diffWeight = 0.8;
 Opt.crossProb = 0.95;
 
-main(Opt);
+Parent = main(Opt);
 
 %% Helper Functions
-function main(Opt)
+function Parent = main(Opt)
 Parent = initialize(Opt);
 
 for g = 1:100
