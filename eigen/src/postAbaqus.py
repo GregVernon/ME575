@@ -6,8 +6,8 @@ def main():
 	writeObjectiveValue(f)
 	
 def evaluateObjectiveFunction():
-	session.openOdb('C:/Users/gregj/Documents/Abaqus/Temp/drumEigen.odb')
-	odb = session.odbs['C:/Users/gregj/Documents/Abaqus/Temp/drumEigen.odb']
+	odb = session.openOdb('C:/Users/gregj/Documents/GitHub/ME575/eigen/src/drumEigen.odb')
+	odb = session.odbs['C:/Users/gregj/Documents/GitHub/ME575/eigen/src/drumEigen.odb']
 	f = odb.steps['Step-1'].frames[1].frequency
 	odb.close()
 	return f
