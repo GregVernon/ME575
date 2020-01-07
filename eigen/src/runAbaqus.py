@@ -28,7 +28,7 @@ def main():
 	submitJob()
 
 def makeGeom():
-	mdb.ModelFromInputFile(inputFileName='C:/Users/gregj/Documents/test.inp', name='temp')
+	mdb.ModelFromInputFile(inputFileName='test.inp', name='temp')
 	del mdb.models['Model-1']
 	mdb.models.changeKey(fromName='temp', toName='Model-1')
 	del mdb.models['Model-1'].steps['DefaultSet']

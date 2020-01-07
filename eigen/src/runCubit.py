@@ -5,7 +5,7 @@ import sys
 # import cubit
 # cubit.init(['cubit','-nojournal','-nogui','nographics'])
 
-f = open("C:\Users\gregj\Documents\Abaqus\Temp\inputData.csv","r")
+f = open("inputData.csv","r")
 fLines = f.readlines()
 x = []
 y = []
@@ -57,4 +57,4 @@ while validMesh == False:
     validMesh = False
 
 # cubit.cmd("block 1 element type shell4")
-cubit.cmd("export abaqus 'C:/Users/gregj/Documents/test.inp'  overwrite  everything ")
+cubit.cmd("export abaqus 'test.inp'  overwrite  everything ")
