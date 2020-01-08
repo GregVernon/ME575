@@ -43,7 +43,7 @@ else
     m = matfile("drumEigen_results.mat",'Writable',true);
     m.Opt = Opt;
     m.Parent = Parent;
-    m.Child = [m.Child; Child];
+    m.Child = Child;
 end
 
 for ii = 1:length(Parent)
