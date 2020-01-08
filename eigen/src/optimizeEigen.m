@@ -1,18 +1,24 @@
 Opt.nDOF = 4;
-Opt.nChildren = 4;
+Opt.nChildren = 20;
 % Opt.diffWeight = 0.8;
 Opt.crossProb = 0.95;
-
+Opt.InitFile = "drumEigen_results.mat";
 Parent = main(Opt);
 
 %% Helper Functions
 function Parent = main(Opt)
-for g = 1:100
+for g = 1:1000
     disp("Generation: " + num2str(g))
     Opt.generation = g;
     if g == 1
-        Parent = initialize(Opt);
-        Child = Parent;
+        if Opt.InitFile == ""
+            Parent = initialize(Opt);
+            Child = Parent;
+        else
+            m = matfile(Opt.InitFile);
+            Parent = m.Parent;
+            Child = Parent;
+        end
     else
         Child = createNextGeneration(Opt,Parent);
         parfor c = 1:Opt.nChildren
