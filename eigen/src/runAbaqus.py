@@ -16,19 +16,19 @@ from sketch import *
 from visualization import *
 from connectorBehavior import *
 
-def main():
-	makeGeom()
+def main(simID):
+	makeGeom(simID)
 	makeMesh()
 	makeMaterial()
 	makeAssembly()
 	makeAssembly()
 	makeStep()
 	makeBoundaryConditions()
-	makeJob()
+	makeJob(simID)
 	submitJob()
 
-def makeGeom():
-	mdb.ModelFromInputFile(inputFileName='test.inp', name='temp')
+def makeGeom(simID):
+	mdb.ModelFromInputFile(inputFileName='test_' + str(simID) + '.inp', name='temp')
 	del mdb.models['Model-1']
 	mdb.models.changeKey(fromName='temp', toName='Model-1')
 	del mdb.models['Model-1'].steps['DefaultSet']
@@ -108,17 +108,17 @@ def makeBoundaryConditions():
 		'BC-2', region=mdb.models['Model-1'].rootAssembly.instances['PART-DEFAULT_1'].sets['NS1'], u1=0.0, 
 		u2=0.0, u3=0.0, ur1=UNSET, ur2=UNSET, ur3=UNSET)
 
-def makeJob():
+def makeJob(simID):
 	mdb.Job(atTime=None, contactPrint=OFF, description='', echoPrint=OFF, 
 		explicitPrecision=SINGLE, getMemoryFromAnalysis=True, historyPrint=OFF, 
 		memory=90, memoryUnits=PERCENTAGE, model='Model-1', modelPrint=OFF, name=
-		'drumEigen', nodalOutputPrecision=SINGLE, queue=None, resultsFormat=ODB, 
+		'drumEigen_' + str(simID), nodalOutputPrecision=SINGLE, queue=None, resultsFormat=ODB, 
 		scratch='', type=ANALYSIS, userSubroutine='', waitHours=0, waitMinutes=0)
 
 def submitJob():
-	mdb.saveAs("drumEigen.cae")
-	mdb.jobs['drumEigen'].submit(consistencyChecking=OFF)
+	mdb.jobs['drumEigen_' + str(simID)].submit(consistencyChecking=OFF)
 
 if __name__ == "__main__":
-	main()
+	simID = sys.argv[-1]
+	main(simID)
 	

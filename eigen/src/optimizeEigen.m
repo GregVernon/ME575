@@ -18,7 +18,7 @@ for g = 1:100
         f = zeros(Opt.nChildren,1);
         for c = 1:Opt.nChildren
             disp("Evaluating function: " + num2str(c))
-            f(c) = functionEvaluation(Child(c).x);
+            f(c) = functionEvaluation(Child(c));
             Child(c).objVal = f(c);
         end
         
@@ -113,48 +113,51 @@ for ii = 1:nChildren
         radius = rand * maxRadius;
         x{ii}(n,:) = [radius*cos(theta) radius*sin(theta)];
     end
+    Parent(ii).x = x{ii};
+    Parent(ii).objVal = NaN;
+    Parent(ii).generation = Opt.generation;
+    Parent(ii).individual = ii;
 end
 
 f = zeros(nChildren,1);
 for ii = 1:nChildren
     disp("Evaluating function: " + num2str(ii))
-    f(ii) = functionEvaluation(x{ii});
+    f(ii) = functionEvaluation(Parent(ii));
 end
 
 for ii = 1:nChildren
-    Parent(ii).x = x{ii};
     Parent(ii).objVal = f(ii);
-    Parent(ii).generation = Opt.generation;
-    Parent(ii).individual = ii;
 end
 end
 
 %%%%%%%%%%%
 
-function f = functionEvaluation(x)
+function f = functionEvaluation(Child)
+x = Child.x;
+simID = Child.individual;
 abqPath = 'C:\Program Files\SIMULIA\Commands\';
 cubPath = 'C:\Program Files\Cubit 15.4\bin\';
 %% Write input data file
-% fData = fopen("C:\Users\gregj\Documents\Abaqus\Temp\inputData.csv","w+");
-fName = "inputData.csv";
+fName = "inputData_" + num2str(simID) + ".csv";
 csvwrite(fName,x);
 %% Create Mesh in Cubit
-command = string(['"' cubPath 'claro.exe" -nobanner -nographics -nojournal -noecho -information off -batch runCubit.py']);
+command = string(['"' cubPath 'claro.exe" -nobanner -nographics -nojournal -noecho -information off -batch simID=' num2str(simID) ' runCubit.py']);
 command = strjoin(command);
 [~,~] = system(command);
 
 %% Run Abaqus Simulation
 % command = string(['"C:/Program Files\SIMULIA\Commands\abaqus.bat" cae noGUI=C:\Users\gregj\Documents\GitHub\ME575\eigen\src\runAbaqus.py -- ', num2str(x), " ", num2str(y)]);
-command = string(['"' abqPath 'abaqus.bat" cae noGUI=runAbaqus.py']);
+command = string(['"' abqPath 'abaqus.bat" cae noGUI=runAbaqus.py -- ', num2str(simID)]);
 command = strjoin(command);
 system(command);
 
 %% Post-process Abaqus Simulation
-command = '"C:\Program Files\SIMULIA\Commands\abaqus.bat" cae noGUI=postAbaqus.py';
+command = string(['"C:\Program Files\SIMULIA\Commands\abaqus.bat" cae noGUI=postAbaqus.py -- ', num2str(simID)]);
+command = strjoin(command);
 system(command);
 
 %% Read in objective function
-f = fileread("objectiveFunction.csv");
+f = fileread("objectiveFunction_" + num2str(simID) + ".csv");
 f = str2double(f);
 f = -f;
 end

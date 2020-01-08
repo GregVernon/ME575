@@ -1,11 +1,10 @@
 import os
 import sys
 
-# sys.path.append(r"C:\Program Files\Cubit 15.4\bin\")
-# import cubit
-# cubit.init(['cubit','-nojournal','-nogui','nographics'])
+simID = cubit.get_aprepro_numeric_value("simID")
+simID = int(simID)
 
-f = open("inputData.csv","r")
+f = open("inputData_" + str(simID) + ".csv","r")
 fLines = f.readlines()
 x = []
 y = []
@@ -24,7 +23,7 @@ for i in range(0,len(x)):
     newVertex = "2"
   else:
     newVertex = newVertex + " " + str(i+2)
-  
+
 cubit.cmd("imprint volume all with vertex " + newVertex)
 cubit.cmd("delete free vertex all")
 cubit.cmd("compress ids")
@@ -55,6 +54,6 @@ while validMesh == False:
     validMesh = True
   if nNodes > maxNodes:
     validMesh = False
-
-# cubit.cmd("block 1 element type shell4")
-cubit.cmd("export abaqus 'test.inp'  overwrite  everything ")
+    
+  
+cubit.cmd("export abaqus 'test_" + str(simID) + ".inp'  overwrite  everything ")
