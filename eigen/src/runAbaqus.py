@@ -114,6 +114,7 @@ def makeJob(simID):
 		memory=90, memoryUnits=PERCENTAGE, model='Model-1', modelPrint=OFF, name=
 		'drumEigen_' + str(simID), nodalOutputPrecision=SINGLE, queue=None, resultsFormat=ODB, 
 		scratch='', type=ANALYSIS, userSubroutine='', waitHours=0, waitMinutes=0)
+	mdb.saveAs("drumEigen_" + str(simID) + ".cae")
 
 def submitJob():
 	mdb.jobs['drumEigen_' + str(simID)].submit(consistencyChecking=OFF)
