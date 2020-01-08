@@ -46,6 +46,12 @@ else
     m.Child = [m.Child; Child];
 end
 
+for ii = 1:length(Parent)
+    if Parent(ii).generation == Opt.generation
+        copyfile("drumEigen_"+num2str(ii)+".cae","drumEigen_Parent_"+num2str(ii)+".cae");
+        copyfile("drumEigen_"+num2str(ii)+".odb","drumEigen_Parent_"+num2str(ii)+".odb");
+    end
+end
 end
 
 %%%%%%%%%%%
