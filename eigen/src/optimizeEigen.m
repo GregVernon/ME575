@@ -182,7 +182,7 @@ csvwrite(fName,x);
 %% Create Mesh in Cubit
 command = string(['"' cubPath 'claro.exe" -nobanner -nographics -nojournal -noecho -information off -batch simID=' num2str(simID) ' runCubit.py']);
 command = strjoin(command);
-[~,~] = system(command);
+[status,~] = system(command);
 
 %% Run Abaqus Simulation
 % command = string(['"C:/Program Files\SIMULIA\Commands\abaqus.bat" cae noGUI=C:\Users\gregj\Documents\GitHub\ME575\eigen\src\runAbaqus.py -- ', num2str(x), " ", num2str(y)]);
@@ -190,7 +190,7 @@ workerID = labindex;
 pause(workerID/10); % Helps avoid .rec file name clashing
 command = string(['"' abqPath 'abaqus.bat" cae noGUI=runAbaqus.py -- ', num2str(simID)]);
 command = strjoin(command);
-system(command);
+[status,~] = system(command);
 % pause(1); % Give some time for things to catch up?
 %% Post-process Abaqus Simulation
 command = string(['"C:\Program Files\SIMULIA\Commands\abaqus.bat" cae noGUI=postAbaqus.py -- ', num2str(simID)]);
