@@ -24,6 +24,7 @@ for g = 1:100
         Parent = tournament(Parent,Child);
     end
     writeOutput(Opt,Parent,Child);
+    plotParents(Opt,Parent);
 end
 end
 
@@ -127,7 +128,22 @@ end
 
 %%%%%%%%%%%
 
+function plotParents(Opt,Parent)
+X = {Parent.x};
+close all
+figure
+hold on;
+
+t = linspace(0,2*pi,10000);
+x = cos(t);
+y = sin(t);
+plot(x,y);
+
+for ii = 1:length(X)
+    scatter(X{ii}(:,1),X{ii}(:,2),60,'.')
 end
+axis equal
+title("Parents @ Generation: " + num2str(Opt.generation))
 end
 
 %%%%%%%%%%%
