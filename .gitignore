@@ -10,3 +10,7 @@
 *.sta
 *.rec
 *.asv
+*.mat
+*.csv
+*.stt
+*.lck
