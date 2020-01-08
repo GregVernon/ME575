@@ -12,8 +12,8 @@ open(VID);
 Parent = main(Opt,VID);
 
 %% Helper Functions
-function Parent = main(Opt)
 for g = 1:1000
+function Parent = main(Opt,VID)
     disp("Generation: " + num2str(g))
     Opt.generation = g;
     if g == 1
