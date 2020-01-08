@@ -14,3 +14,10 @@
 *.csv
 *.stt
 *.lck
+*.env
+*.SMABulk
+*.mdl
+*.odb_f
+*.SMAFocus
+*.simlog
+*.023
