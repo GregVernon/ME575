@@ -15,11 +15,10 @@ for g = 1:100
         Child = Parent;
     else
         Child = createNextGeneration(Opt,Parent);
-        f = zeros(Opt.nChildren,1);
-        for c = 1:Opt.nChildren
+        parfor c = 1:Opt.nChildren
             disp("Evaluating function: " + num2str(c))
-            f(c) = functionEvaluation(Child(c));
-            Child(c).objVal = f(c);
+            f = functionEvaluation(Child(c));
+            Child(c).objVal = f;
         end
         
         Parent = tournament(Parent,Child);
@@ -119,14 +118,15 @@ for ii = 1:nChildren
     Parent(ii).individual = ii;
 end
 
-f = zeros(nChildren,1);
-for ii = 1:nChildren
+parfor ii = 1:nChildren
     disp("Evaluating function: " + num2str(ii))
-    f(ii) = functionEvaluation(Parent(ii));
+    f = functionEvaluation(Parent(ii));
+    Parent(ii).objVal = f
+end
 end
 
-for ii = 1:nChildren
-    Parent(ii).objVal = f(ii);
+%%%%%%%%%%%
+
 end
 end
 
@@ -147,10 +147,11 @@ command = strjoin(command);
 
 %% Run Abaqus Simulation
 % command = string(['"C:/Program Files\SIMULIA\Commands\abaqus.bat" cae noGUI=C:\Users\gregj\Documents\GitHub\ME575\eigen\src\runAbaqus.py -- ', num2str(x), " ", num2str(y)]);
+pause(simID/10); % Helps avoid .rec file name clashing
 command = string(['"' abqPath 'abaqus.bat" cae noGUI=runAbaqus.py -- ', num2str(simID)]);
 command = strjoin(command);
 system(command);
-
+% pause(1); % Give some time for things to catch up?
 %% Post-process Abaqus Simulation
 command = string(['"C:\Program Files\SIMULIA\Commands\abaqus.bat" cae noGUI=postAbaqus.py -- ', num2str(simID)]);
 command = strjoin(command);
