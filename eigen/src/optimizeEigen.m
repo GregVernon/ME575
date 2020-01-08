@@ -2,8 +2,14 @@ Opt.nDOF = 4;
 Opt.nChildren = 20;
 % Opt.diffWeight = 0.8;
 Opt.crossProb = 0.95;
-Opt.InitFile = "drumEigen_results.mat";
-Parent = main(Opt);
+Opt.InitFile = "";
+
+VID = VideoWriter("drumEigen.mp4",'MPEG-4');
+VID.FrameRate = 4;
+VID.Quality = 100;
+open(VID);
+
+Parent = main(Opt,VID);
 
 %% Helper Functions
 function Parent = main(Opt)
@@ -30,8 +36,9 @@ for g = 1:1000
         Parent = tournament(Parent,Child);
     end
     writeOutput(Opt,Parent,Child);
-    plotParents(Opt,Parent);
+    plotParents(Opt,Parent,VID);
 end
+close(VID)
 end
 
 %%%%%%%%%%%
@@ -140,7 +147,7 @@ end
 
 %%%%%%%%%%%
 
-function plotParents(Opt,Parent)
+function plotParents(Opt,Parent,VID)
 X = {Parent.x};
 close all
 figure
@@ -157,6 +164,9 @@ end
 axis equal
 title("Parents @ Generation: " + num2str(Opt.generation))
 drawnow
+
+f = getframe(gcf);
+writeVideo(VID,f);
 end
 
 %%%%%%%%%%%
