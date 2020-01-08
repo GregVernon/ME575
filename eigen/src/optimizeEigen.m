@@ -150,6 +150,7 @@ for ii = 1:length(X)
 end
 axis equal
 title("Parents @ Generation: " + num2str(Opt.generation))
+drawnow
 end
 
 %%%%%%%%%%%
