@@ -192,14 +192,13 @@ command = string(['"' abqPath 'abaqus.bat" cae noGUI=runAbaqus.py -- ', num2str(
 command = strjoin(command);
 system(command);
 % pause(1); % Give some time for things to catch up?
+%% Post-process Abaqus Simulation
+command = string(['"C:\Program Files\SIMULIA\Commands\abaqus.bat" cae noGUI=postAbaqus.py -- ', num2str(simID)]);
+command = strjoin(command);
+[status,~] = system(command);
+%% Read in objective function
 success = isfile("objectiveFunction_" + num2str(simID) + ".csv");
 if success == true
-    %% Post-process Abaqus Simulation
-    command = string(['"C:\Program Files\SIMULIA\Commands\abaqus.bat" cae noGUI=postAbaqus.py -- ', num2str(simID)]);
-    command = strjoin(command);
-    system(command);
-
-    %% Read in objective function
     f = fileread("objectiveFunction_" + num2str(simID) + ".csv");
     f = str2double(f);
     f = -f;
