@@ -1,4 +1,4 @@
-Opt.nDOF = 4;
+Opt.nDOF = 3;
 Opt.nChildren = 20;
 % Opt.diffWeight = 0.8;
 Opt.crossProb = 0.95;
@@ -13,7 +13,7 @@ Parent = main(Opt,VID);
 
 %% Helper Functions
 function Parent = main(Opt,VID)
-for g = 1:100
+for g = 1:1000
     disp("Generation: " + num2str(g))
     Opt.generation = g;
     if g == 1
@@ -55,8 +55,10 @@ end
 
 for ii = 1:length(Parent)
     if Parent(ii).generation == Opt.generation
-        copyfile("drumEigen_"+num2str(ii)+".cae","drumEigen_Parent_"+num2str(ii)+".cae");
-        copyfile("drumEigen_"+num2str(ii)+".odb","drumEigen_Parent_"+num2str(ii)+".odb");
+        try
+            copyfile("drumEigen_"+num2str(ii)+".cae","drumEigen_Parent_"+num2str(ii)+".cae");
+            copyfile("drumEigen_"+num2str(ii)+".odb","drumEigen_Parent_"+num2str(ii)+".odb");
+        end
     end
 end
 end
@@ -192,17 +194,22 @@ command = string(['"' abqPath 'abaqus.bat" cae noGUI=runAbaqus.py -- ', num2str(
 command = strjoin(command);
 [status,~] = system(command);
 % pause(1); % Give some time for things to catch up?
-%% Post-process Abaqus Simulation
-command = string(['"C:\Program Files\SIMULIA\Commands\abaqus.bat" cae noGUI=postAbaqus.py -- ', num2str(simID)]);
-command = strjoin(command);
-[status,~] = system(command);
-%% Read in objective function
-success = isfile("objectiveFunction_" + num2str(simID) + ".csv");
+success = isfile("drumEigen_"+num2str(simID)+".odb");
 if success == true
-    f = fileread("objectiveFunction_" + num2str(simID) + ".csv");
-    f = str2double(f);
-    f = -f;
-    delete("objectiveFunction_" + num2str(simID) + ".csv");
+    %% Post-process Abaqus Simulation
+    command = string(['"C:\Program Files\SIMULIA\Commands\abaqus.bat" cae noGUI=postAbaqus.py -- ', num2str(simID)]);
+    command = strjoin(command);
+    [status,~] = system(command);
+    %% Read in objective function
+    success = isfile("objectiveFunction_" + num2str(simID) + ".csv");
+    if success == true
+        f = fileread("objectiveFunction_" + num2str(simID) + ".csv");
+        f = str2double(f);
+        f = -f;
+        delete("objectiveFunction_" + num2str(simID) + ".csv");
+    else
+        f = inf;
+    end
 else
     f = inf;
 end
