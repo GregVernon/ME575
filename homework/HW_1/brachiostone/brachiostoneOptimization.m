@@ -73,5 +73,4 @@ f = bezier([bezNodes(:,1) bezNodes(:,2)],B);
 x = f(:,1);
 y = f(:,2);
 plot(x,y,'-o')
-
-plot(x,y,'-o')
+plot(bezNodes(:,1),bezNodes(:,2),'LineStyle','-','Color','k','Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k')
