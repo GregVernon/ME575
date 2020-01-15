@@ -74,3 +74,47 @@ x = f(:,1);
 y = f(:,2);
 plot(x,y,'-o')
 plot(bezNodes(:,1),bezNodes(:,2),'LineStyle','-','Color','k','Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k')
+
+%% "Coarse-Grid Preconditioning"
+clear
+
+figure 
+hold on
+
+xMin = 0;
+xMax = 1;
+yMin = 0;
+yMax = 1;
+
+nx = 2.^[2:8];
+for iter = 1:length(nx)
+    if iter == 1
+        x = linspace(xMin,xMax,nx(iter));
+        dx = x(2) - x(1);
+        y = interp1([0 1],[1 0],x);
+    else
+        xOld = x;
+        yOld = y;
+        x = linspace(xMin,xMax,nx(iter));
+        y = interp1(xOld,yOld,x);
+    end
+    y(1) = yMax;
+    y(end) = yMin;
+    
+    mu = 0.0;
+    
+%     % figure
+    plot(x,y,'--o')
+    
+    % Solve via Bernoulli Method
+    options = optimset;
+    options.MaxFunEvals = 1e6;
+    options.MaxIter = 1e4;
+    
+    H = yMax - yMin;
+    options = optimset;
+    options.MaxFunEvals = 1e6;
+    % options.PlotFcns = ["optimplotx","optimplotfval","optimplotfunccount"];
+    y = fminunc(@(y)ning(y,x,H,mu),y,options);
+%     plot(x,y,'-')
+end
