@@ -10,12 +10,10 @@ yMax = 1;
 x = linspace(xMin,xMax,nx);
 dx = x(2) - x(1);
 y = interp1([0 1],[1 0],x);
-% y = sort(rand(size(x)),'descend');
-% y = rand(size(x));
 y(1) = yMax;
 y(end) = yMin;
 
-mu = 0.3;
+mu = 0.0;
 g = 9.81;
 m = 1;
 
@@ -28,7 +26,7 @@ options = optimset;
 options.MaxFunEvals = 1e6;
 % options.PlotFcns = ["optimplotx","optimplotfval","optimplotfunccount"];
 
-y = fminunc(@(y)belgundu(y,dx),y,options);
+y = fminunc(@(y)belgundu(y,dx,m,g,mu),y,options);
 
 plot(x,y,'-o')
 
