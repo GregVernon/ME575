@@ -75,6 +75,41 @@ y = f(:,2);
 plot(x,y,'-o')
 plot(bezNodes(:,1),bezNodes(:,2),'LineStyle','-','Color','k','Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k')
 
+%% Scaling of Ning Method
+clear
+nx = 2.^[2:8];
+xMin = 0;
+xMax = 1;
+yMin = 0;
+yMax = 1;
+
+mu = 0;
+
+for iter = 1:length(nx)
+    x = linspace(xMin,xMax,nx(iter));
+    dx = x(2) - x(1);
+    y = interp1([0 1],[1 0],x);
+    y(1) = yMax;
+    y(end) = yMin;
+
+    H = yMax - yMin;
+    options = optimset;
+    options.MaxFunEvals = 1e6;
+    options.MaxIter = 1e4;
+    
+    [~,fval,~,output] = fminunc(@(y)ning(y,x,H,mu),y,options);
+    solverData(iter) = output;
+    
+    benchFun = @() fminunc(@(y)ning(y,x,H,mu),y,options);
+    t(iter) = timeit(benchFun);
+end
+plot(nx,t,"Color",'k',"LineStyle",'-',"Marker",'o',"MarkerFaceColor",'k',"MarkerEdgeColor",'k')
+xlabel("Number of Points (nDOF + 2)")
+ylabel("Solve Time (sec)")
+
+%% Scaling of Bezier-enhanced Ning
+
+
 %% "Coarse-Grid Preconditioning"
 clear
 
