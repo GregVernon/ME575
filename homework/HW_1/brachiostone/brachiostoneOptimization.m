@@ -1,3 +1,4 @@
+%% Belegundu Method
 clear
 
 nx = 16;
@@ -27,6 +28,14 @@ options.MaxIter = 1e4;
 % options.PlotFcns = ["optimplotx","optimplotfval","optimplotfunccount"];
 
 y = fminunc(@(y)belgundu(y,dx,m,g,mu),y,options);
+
+% Exact Solution
+[xExact, yExact] = exactSolution(mu,1e4);
+
+figure 
+hold on
+plot(xExact,yExact)
+plot(x,y)
 
 
 %% Ning Method
