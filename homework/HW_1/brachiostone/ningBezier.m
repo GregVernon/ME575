@@ -1,12 +1,12 @@
-function J = ningBezier(dofNodes,domain,mu,nPts)
+function J = ningBezier(dofNodes,domain,mu,B)
 % dofNodes = [x2,y2,x3,y3,x(n-1),y(n-1)]
 % domain = [x0,y0,xn,yn]
 bezNodes = [domain(1) domain(2) dofNodes domain(3) domain(4)];
 % nodes = [x1,y1,x2,y2,x3,y3,...xn,yn]
 bezNodes = transpose(reshape(bezNodes,2,length(bezNodes)/2));
-[f,B] = bezier([bezNodes(:,1) bezNodes(:,2)],nPts);
-x = f(:,1);
-y = f(:,2);
+bez = bezier([bezNodes(:,1) bezNodes(:,2)],B);
+x = bez(:,1);
+y = bez(:,2);
 % y(end) = 0;
 % y(1) = y(end) + H;
 
