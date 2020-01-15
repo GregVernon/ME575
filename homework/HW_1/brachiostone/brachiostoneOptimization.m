@@ -77,6 +77,8 @@ plot(bezNodes(:,1),bezNodes(:,2),'LineStyle','-','Color','k','Marker','o','Marke
 
 %% Scaling of Ning Method
 clear
+maxNumCompThreads(1) % Run Single-Thread
+
 nx = 2.^[2:8];
 xMin = 0;
 xMax = 1;
@@ -108,7 +110,45 @@ xlabel("Number of Points (nDOF + 2)")
 ylabel("Solve Time (sec)")
 
 %% Scaling of Bezier-enhanced Ning
+clear
+maxNumCompThreads(1) % Run Single-Thread
 
+xMin = 0;
+xMax = 1;
+yMin = 0;
+yMax = 1;
+domain = [xMin yMax xMax yMin];
+
+bezDegree = 4;
+bezDomain = [0 1];
+nPts = 2.^[2:12];
+for iter = 1:length(nPts)
+    bezVariate = linspace(bezDomain(1), bezDomain(2),nPts(iter));
+    B = bernsteinPolynomial(bezDegree,bezDomain,bezVariate);
+    nDOFS = (bezDegree+1) - 2;
+    
+    x0 = linspace(xMin,xMax,nDOFS+2);
+    x0(1) = [];
+    x0(end) = [];
+    y0 = interp1([0 1],[1 0],x0);
+
+    dofNodes = [x0' y0'];
+    dofNodes = reshape(dofNodes',1,numel(dofNodes));
+
+    mu = 0.;
+
+    options = optimset;
+    options.MaxFunEvals = 1e6;
+    [~,fval,~,output] = fminunc(@(dofNodes)ningBezier(dofNodes,domain,mu,B),dofNodes,options);
+    solverData(iter) = output;
+    
+    benchFun = @() fminunc(@(dofNodes)ningBezier(dofNodes,domain,mu,B),dofNodes,options);
+    t(iter) = timeit(benchFun);
+end
+figure
+plot(nPts,t,"Color",'k',"LineStyle",'-',"Marker",'o',"MarkerFaceColor",'k',"MarkerEdgeColor",'k')
+xlabel("Number of Points")
+ylabel("Solve Time (sec)")
 
 %% "Coarse-Grid Preconditioning"
 clear
