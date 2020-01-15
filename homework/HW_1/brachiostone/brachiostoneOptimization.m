@@ -56,6 +56,14 @@ options.MaxIter = 1e4;
 % options.PlotFcns = ["optimplotx","optimplotfval","optimplotfunccount"];
 y = fminunc(@(y)ning(y,x,H,mu),y,options);
 
+% Exact Solution
+[xExact, yExact] = exactSolution(mu,1e4);
+
+figure 
+hold on
+plot(xExact,yExact)
+plot(x,y)
+
 %% Bezier Geometry
 clear
 xMin = 0;
@@ -90,6 +98,13 @@ bezNodes = transpose(reshape(bezNodes,2,length(bezNodes)/2));
 f = bezier([bezNodes(:,1) bezNodes(:,2)],B);
 x = f(:,1);
 y = f(:,2);
+
+% Exact Solution
+[xExact, yExact] = exactSolution(mu,1e4);
+
+figure;
+hold on
+plot(exactX,exactY);
 plot(x,y,'-o')
 plot(bezNodes(:,1),bezNodes(:,2),'LineStyle','-','Color','k','Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k')
 
