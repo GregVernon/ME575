@@ -53,7 +53,7 @@ y = interp1([0 1],[1 0],x);
 y(1) = yMax;
 y(end) = yMin;
 
-mu = 0.0;
+mu = 0.9;
 g = 9.81;
 m = 1;
 
@@ -66,12 +66,20 @@ options.MaxIter = 1e4;
 y = fminunc(@(y)ning(y,x,H,mu),y,options);
 
 % Exact Solution
-[xExact, yExact] = exactSolution(mu,1e4);
+[xExact, yExact] = exactSolution(x,mu,"x-locations");
+err = y - yExact;
 
-figure 
+figure
 hold on
 plot(xExact,yExact)
-plot(x,y)
+plot(x,y,'-')
+
+figure
+subplot(2,1,1)
+plot(x,err)
+hold on
+subplot(2,1,2)
+plot(x,err)
 
 %% Bezier Geometry
 clear
@@ -81,9 +89,9 @@ yMin = 0;
 yMax = 1;
 domain = [xMin yMax xMax yMin];
 
-bezDegree = 3;
+bezDegree = 2;
 bezDomain = [0 1];
-nPts = 64;
+nPts = 256;
 bezVariate = linspace(bezDomain(1), bezDomain(2),nPts);
 B = bernsteinPolynomial(bezDegree,bezDomain,bezVariate);
 nDOFS = (bezDegree+1) - 2;
@@ -96,7 +104,7 @@ y0 = interp1([0 1],[1 0],x0);
 dofNodes = [x0' y0'];
 dofNodes = reshape(dofNodes',1,numel(dofNodes));
 
-mu = 0.;
+mu = 0.3;
 
 options = optimset;
 options.MaxFunEvals = 1e6;
@@ -109,13 +117,18 @@ x = f(:,1);
 y = f(:,2);
 
 % Exact Solution
-[xExact, yExact] = exactSolution(mu,1e4);
+[xExact, yExact] = exactSolution(x,mu,"x-locations");
+err = y - yExact;
 
 figure;
+subplot(2,1,1)
 hold on
-plot(exactX,exactY);
+plot(xExact,yExact);
 plot(x,y,'-o')
 plot(bezNodes(:,1),bezNodes(:,2),'LineStyle','-','Color','k','Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k')
+
+subplot(2,1,2)
+plot(x,err)
 
 %% Scaling of Ning Method
 clear
@@ -161,7 +174,7 @@ yMin = 0;
 yMax = 1;
 domain = [xMin yMax xMax yMin];
 
-bezDegree = 4;
+bezDegree = 3;
 bezDomain = [0 1];
 nPts = 2.^[2:12];
 for iter = 1:length(nPts)
@@ -191,6 +204,70 @@ figure
 plot(nPts,t,"Color",'k',"LineStyle",'-',"Marker",'o',"MarkerFaceColor",'k',"MarkerEdgeColor",'k')
 xlabel("Number of Points")
 ylabel("Solve Time (sec)")
+
+%% Difference between Ning and Bezier Ning
+clear
+% First do Ning
+nx = 512;
+nPts = nx;
+
+xMin = 0;
+xMax = 1;
+yMin = 0;
+yMax = 1;
+
+mu = 0.3;
+x = linspace(xMin,xMax,nx);
+dx = x(2) - x(1);
+y = interp1([0 1],[1 0],x);
+y(1) = yMax;
+y(end) = yMin;
+
+H = yMax - yMin;
+options = optimset;
+options.MaxFunEvals = 1e7;
+options.MaxIter = 1e4;
+
+xNing = x;
+yNing = fminunc(@(y)ning(y,x,H,mu),y,options);
+
+% Now do Bezier Ning
+domain = [xMin yMax xMax yMin];
+
+bezDegree = 3;
+bezDomain = [0 1];
+bezVariate = linspace(bezDomain(1), bezDomain(2),nPts);
+B = bernsteinPolynomial(bezDegree,bezDomain,bezVariate);
+nDOFS = (bezDegree+1) - 2;
+
+x0 = linspace(xMin,xMax,nDOFS+2);
+x0(1) = [];
+x0(end) = [];
+y0 = interp1([0 1],[1 0],x0);
+
+dofNodes = [x0' y0'];
+dofNodes = reshape(dofNodes',1,numel(dofNodes));
+
+mu = 0.;
+
+options = optimset;
+options.MaxFunEvals = 1e6;
+dofNodes = fminunc(@(dofNodes)ningBezier(dofNodes,domain,mu,B),dofNodes,options);
+
+bezNodes = [domain(1) domain(2) dofNodes domain(3) domain(4)];
+bezNodes = transpose(reshape(bezNodes,2,length(bezNodes)/2));
+f = bezier([bezNodes(:,1) bezNodes(:,2)],B);
+xBez = f(:,1);
+yBez = f(:,2);
+
+% Now interpolate both sets of results onto same grid
+xInterp = unique([xNing yNing]);
+yInterpNing = interp1(xNing,yNing,xInterp);
+yInterpBez = interp1(xBez,yBez,xInterp);
+
+err = yInterpNing - yInterpBez;
+figure
+plot(xInterp,err)
 
 %% "Coarse-Grid Preconditioning"
 clear
