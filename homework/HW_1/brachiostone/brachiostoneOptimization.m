@@ -53,7 +53,7 @@ y = interp1([0 1],[1 0],x);
 y(1) = yMax;
 y(end) = yMin;
 
-mu = 0.9;
+mu = 0.5;
 g = 9.81;
 m = 1;
 
@@ -68,7 +68,7 @@ options.OptimalityTolerance = 1e-14;
 options.StepTolerance = 1e-14;
 % options.OutputFcn = @outfun;
 % options.PlotFcns = ["optimplotx","optimplotfval","optimplotfunccount"];
-y = fminunc(@(y)ning(y,x,H,mu),y,options);
+[y,fval,exitflag,output]  = fminunc(@(y)ning(y,x,H,mu),y,options);
 
 % Exact Solution
 [xExact, yExact] = exactSolution(x,mu,"x-locations");
@@ -94,7 +94,7 @@ yMin = 0;
 yMax = 1;
 domain = [xMin yMax xMax yMin];
 
-bezDegree = 2;
+bezDegree = 3;
 bezDomain = [0 1];
 nPts = 256;
 bezVariate = linspace(bezDomain(1), bezDomain(2),nPts);
@@ -109,7 +109,7 @@ y0 = interp1([0 1],[1 0],x0);
 dofNodes = [x0' y0'];
 dofNodes = reshape(dofNodes',1,numel(dofNodes));
 
-mu = 0.3;
+mu = 0.0;
 
 options = optimoptions('fminunc');
 options.MaxFunEvals = 1e6;
@@ -128,6 +128,7 @@ y = f(:,2);
 
 % Exact Solution
 [xExact, yExact] = exactSolution(x,mu,"x-locations");
+yExact = (yExact - yExact(end)) .* ( (yMax-yMin) ./ (yExact(1) - yExact(end)));
 err = y - yExact;
 
 figure;
@@ -332,7 +333,7 @@ yMin = 0;
 yMax = 1;
 domain = [xMin yMax xMax yMin];
 
-bezDegree = 3;
+bezDegree = 5;
 bezDomain = [0 1];
 nPts = 256;
 bezVariate = linspace(bezDomain(1), bezDomain(2),nPts);
@@ -347,7 +348,7 @@ y0 = interp1([0 1],[1 0],x0);
 dofNodes = [x0' y0'];
 dofNodes = reshape(dofNodes',1,numel(dofNodes));
 
-mu = 0.9;
+mu = 1.0;
 
 options = optimoptions('fminunc');
 options.MaxFunEvals = 1e6;
@@ -357,9 +358,12 @@ options.TolX = 1e-14;
 options.OptimalityTolerance = 1e-14;
 options.StepTolerance = 1e-14;
 
-muSteps = unique(linspace(0,mu,9));
+muSteps = unique(linspace(0,mu,11));
 for ii = 1:length(muSteps)
-    dofNodes = fminunc(@(dofNodes)ningBezier(dofNodes,domain,muSteps(ii),B),dofNodes,options);
+    fun = @() fminunc(@(dofNodes)ningBezier(dofNodes,domain,muSteps(ii),B),dofNodes,options);
+    t(ii) = timeit(fun);
+    [DOFNODES{ii},~,~,output(ii)] = fminunc(@(dofNodes)ningBezier(dofNodes,domain,muSteps(ii),B),dofNodes,options);
+    dofNodes = DOFNODES{ii};
 end
 
 bezNodes = [domain(1) domain(2) dofNodes domain(3) domain(4)];
@@ -385,6 +389,7 @@ plot(x,err)
 
 %% Ning Method + High Friction
 clear
+maxNumCompThreads(1) % Run Single-Thread
 
 nx = 256;
 xMin = 0;
@@ -398,7 +403,7 @@ y = interp1([0 1],[1 0],x);
 y(1) = yMax;
 y(end) = yMin;
 
-mu = 0.5;
+mu = 1.0;
 g = 9.81;
 m = 1;
 
@@ -412,12 +417,18 @@ options.TolX = 1e-14;
 options.OptimalityTolerance = 1e-14;
 options.StepTolerance = 1e-14;
 % options.PlotFcns = ["optimplotx","optimplotfval","optimplotfunccount"];
-muSteps = unique(linspace(0,mu,9));
+muSteps = unique(linspace(0,mu,11));
+
 for ii = 1:length(muSteps)
-    y = fminunc(@(y)ning(y,x,H,muSteps(ii)),y,options);
+    fun = @() fminunc(@(y)ning(y,x,H,muSteps(ii)),y,options);
+    t(ii) = timeit(fun);
+    [Y{ii},~,~,output(ii)] = fminunc(@(y)ning(y,x,H,muSteps(ii)),y,options);
+    y = Y{ii};
 end
+
 % Exact Solution
 [xExact, yExact] = exactSolution(x,mu,"x-locations");
+yExact = (yExact - yExact(end)) .* ( (yMax-yMin) ./ (yExact(1) - yExact(end)));
 err = y - yExact;
 
 figure
