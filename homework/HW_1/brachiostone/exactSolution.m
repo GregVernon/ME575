@@ -2,9 +2,13 @@ function [x,y] = exactSolution(x,fCoeff,xType)
 if xType == "x-locations"
     a = 0.572917;
     % Solve for theta
-    options = optimset;
+    options = optimoptions('fminunc');
     options.MaxFunEvals = 1e6;
     options.MaxIter = 1e4;
+    options.TolFun = 1e-14;
+    options.TolX = 1e-14;
+    options.OptimalityTolerance = 1e-14;
+    options.StepTolerance = 1e-14;
     theta = reshape(linspace(0,2.412,length(x)),size(x));
     theta = fminunc(@(theta)thetaObjFun(theta,a,fCoeff,x),theta,options);
     y = 1-a*(1-cos(theta) + fCoeff*(theta + sin(theta)));
