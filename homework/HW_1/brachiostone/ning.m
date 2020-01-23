@@ -1,4 +1,4 @@
-function J = ning(y,x,H,mu)
+function [J,t] = ning(y,x,H,mu)
 y(end) = 0;
 y(1) = y(end) + H;
 
@@ -9,4 +9,9 @@ for ii = 1:length(x)-1
     J(ii) = sqrt(dx^2 + dy^2) / (sqrt(H - y(ii+1) - mu*x(ii+1)) + sqrt(H - y(ii) - mu*x(ii)));
 end
 J = sum(J);
+t = computeElapsedTime(J,9.81);
+end
+
+function t = computeElapsedTime(J,g)
+    t = sqrt(2/g) * J;
 end
