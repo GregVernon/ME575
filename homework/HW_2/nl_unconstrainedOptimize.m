@@ -1,11 +1,10 @@
-function [x,nl_res] = nl_unconstrainedOptimize(fun,x0)
+function [x,nl_res] = conjugateGradient(fun,x0,nl_tol,max_iter)
 x0 = reshape(x0,length(x0),1);
 fval = fun(x0);
 x = x0;
-nl_tol = 1e-5;
 iter = 0;
 nl_res = inf;
-while nl_res > nl_tol
+while nl_res > nl_tol && iter <= max_iter
     iter = iter + 1;
     
     % Compute Search Direction
