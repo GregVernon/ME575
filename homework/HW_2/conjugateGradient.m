@@ -7,7 +7,16 @@ arguments
     NameValueArgs.max_iter = 1e3;
 end
 x0 = reshape(x0,length(x0),1);
-fval = fun(x0);
+gradFun = NameValueArgs.gradFun;
+nl_tol = NameValueArgs.nl_tol;
+max_iter = NameValueArgs.max_iter;
+
+if contains(class(gradFun),"sym")
+    gradFun = matlabFunction(gradFun);
+end
+
+funEvals = 0;
+fval = fun(x0); funEvals = funEvals + 1;
 x = x0;
 iter = 0;
 nl_res = inf;
@@ -15,7 +24,17 @@ while nl_res > nl_tol && iter <= max_iter
     iter = iter + 1;
     
     % Compute Search Direction
-    Gk = computeGradient_FDM(fun,x);
+    if strcmpi(gradFun, "Centered Finite Difference") == true
+        [Gk,funEvals] = computeGradient_FDM(fun,x,funEvals);
+    elseif strcmpi(class(gradFun), "function_handle") == true
+        if nargin(gradFun) == 1
+            Gk = gradFun(x);
+        elseif nargin(gradFun) > 1
+            X = num2cell(x);
+            Gk = gradFun(X{:});
+        end
+    end
+    
     if iter == 1
         % Do Steepest Descent
         fval_last = fval;
