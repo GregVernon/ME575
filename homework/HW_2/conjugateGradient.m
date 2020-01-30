@@ -44,7 +44,7 @@ while nl_res > nl_tol && iter <= max_iter
     Pk_last = Pk;
     fval_last = fval;
     
-    nl_res = sum(abs(Gk));
+    nl_res = norm(Gk,2);
 end
 
 
