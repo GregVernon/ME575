@@ -52,12 +52,22 @@ end
 end
 
 function g = computeGradient_FDM(fun,x0)
+% Test if function returns 1 or multiple results
+if length(fun(x0)) == 1
+    singleOutput = true;
+else
+    singleOutput = false;
+end
 g = zeros(length(x0),1);
 dx = 1e-6;
 for dim = 1:length(x0)
     DX = zeros(length(x0),1);
     DX(dim) = dx;
     % Central Difference Approximation
-    g(dim) = (fun(x0+DX) - fun(x0-DX))./(2*dx);
+    if singleOutput == true
+        g(dim) = (fun(x0+DX) - fun(x0-DX))./(2*dx);
+    elseif singleOutput == false
+        g = g + (fun(x0+DX) - fun(x0-DX))./(2*dx);
+    end
 end
 end
