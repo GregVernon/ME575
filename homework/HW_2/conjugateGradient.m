@@ -1,4 +1,11 @@
-function [x,nl_res] = conjugateGradient(fun,x0,nl_tol,max_iter)
+function [x,nl_res,iter,funEvals] = conjugateGradient(fun,x0,NameValueArgs)
+arguments
+    fun
+    x0
+    NameValueArgs.gradFun = "Centered Finite Difference";
+    NameValueArgs.nl_tol = 1e-8;
+    NameValueArgs.max_iter = 1e3;
+end
 x0 = reshape(x0,length(x0),1);
 fval = fun(x0);
 x = x0;
