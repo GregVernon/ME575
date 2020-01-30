@@ -41,6 +41,8 @@ while nl_res > nl_tol && iter <= max_iter
         % Do Steepest Descent
         fval_last = fval;
         Pk = -Gk;
+        % Compute Initial Step Size
+        stepSize = 1;
     else
         % Do Conjugate Gradient
         if strcmpi(searchDirection,"Fletcher-Reeves")
@@ -49,20 +51,21 @@ while nl_res > nl_tol && iter <= max_iter
             Bk = transpose(Gk) * (Gk - Gk_last) / (transpose(Gk_last) * Gk_last);
             Bk = max([0,Bk]);
         elseif strcmpi(searchDirection,"Hestenes-Stiefel")
-            Bk = -(transpose(Gk)) / (Pk_last);
+            Bk = -(transpose(Gk) * (Gk - Gk_last)) / (transpose(Pk_last) * (Gk - Gk_last));
         elseif strcmpi(searchDirection,"Dai-Yuan")
-            Bk = -(transpose(Gk) * Gk) / (Pk_last * (Gk - Gk_last));
+            Bk = -(transpose(Gk) * Gk) / (transpose(Pk_last) * (Gk - Gk_last));
         end
         Pk = -Gk + Bk * Pk_last;
+        % Compute Initial Step Size
+        stepSize = stepSize_last * (transpose(Gk_last) * Pk_last) / (transpose(Gk) * Pk);
     end
-    
-    % Compute Initial Step Size
-    stepSize = 1; %stepSize * (norm(Gk_last,2)/norm(Gk,2)).^2;
-    
+            
     % Sufficient decrease
     isSufficient = false;
     mu = 1e-4;
+    lineSearch_iter = 0;
     while isSufficient == false
+        lineSearch_iter = lineSearch_iter + 1;
         x_test = x + stepSize * Pk;
         fval_test = fun(x_test); funEvals = funEvals + 1;
         condition = fval_test <= fval_last + mu * stepSize * Pk;
@@ -79,6 +82,7 @@ while nl_res > nl_tol && iter <= max_iter
     % Set values for next iteration
     Gk_last = Gk;
     Pk_last = Pk;
+    stepSize_last = stepSize;
     fval_last = fval;
     
     nl_res = norm(Gk,2);
