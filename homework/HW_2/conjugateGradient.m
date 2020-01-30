@@ -53,7 +53,7 @@ while nl_res > nl_tol && iter <= max_iter
     mu = 1e-4;
     while isSufficient == false
         x_test = x + stepSize * Pk;
-        fval_test = fun(x_test);
+        fval_test = fun(x_test); funEvals = funEvals + 1;
         condition = fval_test <= fval_last + mu * stepSize * Pk;
         if condition == true
             isSufficient = true;
@@ -62,7 +62,7 @@ while nl_res > nl_tol && iter <= max_iter
         end
     end
     x = x_test;
-    fval = fun(x);
+    fval = fun(x); funEvals = funEvals + 1;
     
     
     % Set values for next iteration
@@ -77,7 +77,7 @@ end
 
 end
 
-function g = computeGradient_FDM(fun,x0)
+function [g,funEvals] = computeGradient_FDM(fun,x0, funEvals)
 % Test if function returns 1 or multiple results
 if length(fun(x0)) == 1
     singleOutput = true;
@@ -91,9 +91,9 @@ for dim = 1:length(x0)
     DX(dim) = dx;
     % Central Difference Approximation
     if singleOutput == true
-        g(dim) = (fun(x0+DX) - fun(x0-DX))./(2*dx);
+        g(dim) = (fun(x0+DX) - fun(x0-DX))./(2*dx); funEvals = funEvals + 2;
     elseif singleOutput == false
-        g = g + (fun(x0+DX) - fun(x0-DX))./(2*dx);
+        g = g + (fun(x0+DX) - fun(x0-DX))./(2*dx); funEvals = funEvals + 1;
     end
 end
 end
