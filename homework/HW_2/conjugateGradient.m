@@ -55,7 +55,7 @@ end
 
 function g = computeGradient_FDM(fun,x0)
 g = zeros(length(x0),1);
-dx = 1e-4;
+dx = 1e-6;
 for dim = 1:length(x0)
     DX = zeros(length(x0),1);
     DX(dim) = dx;
