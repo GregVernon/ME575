@@ -57,7 +57,7 @@ while nl_res > nl_tol && iter <= max_iter
         end
         Pk = -Gk + Bk * Pk_last;
         % Compute Initial Step Size
-        stepSize = stepSize_last * (transpose(Gk_last) * Pk_last) / (transpose(Gk) * Pk);
+        stepSize = 1; %stepSize_last * (transpose(Gk_last) * Pk_last) / (transpose(Gk) * Pk);
     end
             
     % Sufficient decrease
