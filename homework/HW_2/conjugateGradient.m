@@ -5,11 +5,13 @@ arguments
     NameValueArgs.gradFun = "Centered Finite Difference";
     NameValueArgs.nl_tol = 1e-8;
     NameValueArgs.max_iter = 1e3;
+    NameValueArgs.searchDirection = "Fletcher-Reeves";
 end
 x0 = reshape(x0,length(x0),1);
 gradFun = NameValueArgs.gradFun;
 nl_tol = NameValueArgs.nl_tol;
 max_iter = NameValueArgs.max_iter;
+searchDirection = NameValueArgs.searchDirection;
 
 if contains(class(gradFun),"sym")
     gradFun = matlabFunction(gradFun);
@@ -41,7 +43,12 @@ while nl_res > nl_tol && iter <= max_iter
         Pk = -Gk;
     else
         % Do Conjugate Gradient
-        Bk = (transpose(Gk) * Gk) / (transpose(Gk_last) * Gk_last);
+        if strcmpi(searchDirection,"Fletcher-Reeves")
+            Bk = (transpose(Gk) * Gk) / (transpose(Gk_last) * Gk_last);
+        elseif strcmpi(searchDirection,"Polak-Ribiere")
+            Bk = transpose(Gk) * (Gk - Gk_last) / (transpose(Gk_last) * Gk_last);
+            Bk = max([0,Bk]);
+        end
         Pk = -Gk + Bk * Pk_last;
     end
     
