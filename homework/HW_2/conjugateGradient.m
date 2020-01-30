@@ -93,7 +93,7 @@ for dim = 1:length(x0)
     if singleOutput == true
         g(dim) = (fun(x0+DX) - fun(x0-DX))./(2*dx); funEvals = funEvals + 2;
     elseif singleOutput == false
-        g = g + (fun(x0+DX) - fun(x0-DX))./(2*dx); funEvals = funEvals + 1;
+        g = g + (fun(x0+DX) - fun(x0-DX))./(2*dx); funEvals = funEvals + 2;
     end
 end
 end
