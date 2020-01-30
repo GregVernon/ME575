@@ -48,6 +48,10 @@ while nl_res > nl_tol && iter <= max_iter
         elseif strcmpi(searchDirection,"Polak-Ribiere")
             Bk = transpose(Gk) * (Gk - Gk_last) / (transpose(Gk_last) * Gk_last);
             Bk = max([0,Bk]);
+        elseif strcmpi(searchDirection,"Hestenes-Stiefel")
+            Bk = -(transpose(Gk)) / (Pk_last);
+        elseif strcmpi(searchDirection,"Dai-Yuan")
+            Bk = -(transpose(Gk) * Gk) / (Pk_last * (Gk - Gk_last));
         end
         Pk = -Gk + Bk * Pk_last;
     end
