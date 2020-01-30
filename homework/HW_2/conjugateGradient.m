@@ -13,15 +13,13 @@ while nl_res > nl_tol && iter <= max_iter
         % Do Steepest Descent
         fval_last = fval;
         Pk = -Gk;
-        stepSize = 1;
-        Gk_last = 1;
     else
         % Do Conjugate Gradient
         Bk = (transpose(Gk) * Gk) / (transpose(Gk_last) * Gk_last);
         Pk = -Gk + Bk * Pk_last;
     end
     
-    % Compute Step Size
+    % Compute Initial Step Size
     stepSize = 1; %stepSize * (norm(Gk_last,2)/norm(Gk,2)).^2;
     
     % Sufficient decrease
