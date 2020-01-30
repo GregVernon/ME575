@@ -57,9 +57,9 @@ function g = computeGradient_FDM(fun,x0)
 g = zeros(length(x0),1);
 dx = 1e-4;
 for dim = 1:length(x0)
-%     DX = zeros(length(x0),1);
-%     DX(dim) = dx;
+    DX = zeros(length(x0),1);
+    DX(dim) = dx;
     % Central Difference Approximation
-    g(dim) = (fun(x0(dim)+dx) - fun(x0(dim)-dx))./(2*dx);
+    g(dim) = (fun(x0+DX) - fun(x0-DX))./(2*dx);
 end
 end
