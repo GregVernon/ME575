@@ -36,8 +36,16 @@ if nargin == 3  % means no options were passed in
 end
 
 if strcmpi(method,"CG")
-    [xopt,fopt,res,funEvals] = conjugateGradient(fun,x0,"gradFun",gradFun,"nl_tol",epsilon_g,"max_iter",1e4);
+    [xopt,fopt,res,iter,funEvals] = conjugateGradient(fun,x0,"gradFun",gradFun,"nl_tol",epsilon_g,"max_iter",1e4);
 elseif strcmpi(method,"BFGS")
-    [xopt,fopt,res,funEvals] = BFGS(fun,x0,"gradFun",gradFun,"nl_tol",epsilon_g,"max_iter",1e4);
+    [xopt,fopt,res,iter,funEvals] = BFGS(fun,x0,"gradFun",gradFun,"nl_tol",epsilon_g,"max_iter",1e4);
+elseif strcmpi(method,"fminunc")
+    options = optimoptions("fminunc");
+    options.MaxIterations = 400;
+    options.OptimalityTolerance = epsilon_g;
+    [xopt,fopt,~,output] = fminunc(fun,x0,options);
+    res = output.firstorderopt;
+    iter = output.iterations;
+    funEvals = output.funcCount;
 end
 end
