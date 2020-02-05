@@ -34,9 +34,10 @@ if nargin == 3  % means no options were passed in
     method = "BFGS";
     gradFun = "Integrated"; % Complex-Step % Centered-Difference
 end
+
 if strcmpi(method,"CG")
-    [x,res,funEvals] = conjugateGradient(fun,x0,"gradFun",gradFun,"nl_tol",epsilon_g,"max_iter",1e4);
+    [xopt,fopt,res,funEvals] = conjugateGradient(fun,x0,"gradFun",gradFun,"nl_tol",epsilon_g,"max_iter",1e4);
 elseif strcmpi(method,"BFGS")
-    [x,res,funEvals] = BFGS(fun,x0,"gradFun",gradFun,"nl_tol",epsilon_g,"max_iter",1e4);
+    [xopt,fopt,res,funEvals] = BFGS(fun,x0,"gradFun",gradFun,"nl_tol",epsilon_g,"max_iter",1e4);
 end
 end
