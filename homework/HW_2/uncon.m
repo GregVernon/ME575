@@ -31,11 +31,12 @@ outputs : struct
 
 if nargin == 3  % means no options were passed in
     % set defaults here for how you want me to run it. 
+    method = "BFGS";
+    gradFun = "Integrated"; % Complex-Step % Centered-Difference
 end
-
-% Your code goes here!  You can (and should) call other functions, but make
-% sure you do not change the function signature for this file.  This is the
-% file I will call to test your algorithm.  I will test using my own
-% versions of matyas, rosenbrock, and brachistochrone.
-
+if strcmpi(method,"CG")
+    [x,res,funEvals] = conjugateGradient(fun,x0,"gradFun",gradFun,"nl_tol",epsilon_g,"max_iter",1e4);
+elseif strcmpi(method,"BFGS")
+    [x,res,funEvals] = BFGS(fun,x0,"gradFun",gradFun,"nl_tol",epsilon_g,"max_iter",1e4);
+end
 end
