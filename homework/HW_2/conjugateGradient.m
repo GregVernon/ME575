@@ -2,7 +2,7 @@ function [x,nl_res,iter,funEvals] = conjugateGradient(fun,x0,NameValueArgs)
 arguments
     fun
     x0
-    NameValueArgs.gradFun = "Centered Finite Difference";
+    NameValueArgs.gradFun = "Centered-Difference";
     NameValueArgs.nl_tol = 1e-8;
     NameValueArgs.max_iter = 1e3;
     NameValueArgs.searchDirection = "Fletcher-Reeves";
@@ -18,23 +18,26 @@ if contains(class(gradFun),"sym")
 end
 
 funEvals = 0;
-fval = fun(x0); funEvals = funEvals + 1;
 x = x0;
 iter = 0;
 nl_res = inf;
-while nl_res > nl_tol && iter <= max_iter
+while iter <= max_iter
     iter = iter + 1;
     
     % Compute Search Direction
-    if strcmpi(gradFun, "Centered Finite Difference") == true
-        [Gk,funEvals] = computeGradient_FDM(fun,x,funEvals);
+    if strcmpi(gradFun, "Centered-Difference") == true || strcmpi(gradFun, "Complex-Step")
+        fval = fun(x); funEvals = funEvals + 1;
+        [Gk,funEvals] = computeGradient_FDM(fun,x,gradFun,funEvals);
     elseif strcmpi(class(gradFun), "function_handle") == true
+        fval = fun(x); funEvals = funEvals + 1;
         if nargin(gradFun) == 1
             Gk = gradFun(x);
         elseif nargin(gradFun) > 1
             X = num2cell(x);
             Gk = gradFun(X{:});
         end
+    elseif strcmpi(gradFun,"integrated") == true
+        [fval,Gk] = fun(x); funEvals = funEvals + 1;
     end
     
     if iter == 1
@@ -59,7 +62,13 @@ while nl_res > nl_tol && iter <= max_iter
         % Compute Initial Step Size
         stepSize = 1; %stepSize_last * (transpose(Gk_last) * Pk_last) / (transpose(Gk) * Pk);
     end
-            
+    
+    % Check to see if we're converged at the current x-value
+    nl_res = norm(Gk,inf);
+    if nl_res <= nl_tol
+        return
+    end
+    
     % Sufficient decrease
     isSufficient = false;
     mu = 1e-4;
@@ -84,15 +93,13 @@ while nl_res > nl_tol && iter <= max_iter
     Pk_last = Pk;
     stepSize_last = stepSize;
     fval_last = fval;
-    
-    nl_res = norm(Gk,2);
 end
 
 
 
 end
 
-function [g,funEvals] = computeGradient_FDM(fun,x0, funEvals)
+function [g,funEvals] = computeGradient_FDM(fun, x0, method, funEvals)
 % Test if function returns 1 or multiple results
 if length(fun(x0)) == 1
     singleOutput = true;
@@ -100,15 +107,26 @@ else
     singleOutput = false;
 end
 g = zeros(length(x0),1);
-dx = 1e-6;
 for dim = 1:length(x0)
     DX = zeros(length(x0),1);
-    DX(dim) = dx;
-    % Central Difference Approximation
-    if singleOutput == true
-        g(dim) = (fun(x0+DX) - fun(x0-DX))./(2*dx); funEvals = funEvals + 2;
-    elseif singleOutput == false
-        g = g + (fun(x0+DX) - fun(x0-DX))./(2*dx); funEvals = funEvals + 2;
+    if strcmpi(method,"Centered-Difference") == true
+        dx = 1e-8;
+        DX(dim) = x0(dim) * dx + eps;
+        % Central Difference Approximation
+        if singleOutput == true
+            g(dim) = (fun(x0+DX) - fun(x0-DX))./(2*DX(dim)); funEvals = funEvals + 2;
+        elseif singleOutput == false
+            g = g + (fun(x0+DX) - fun(x0-DX))./(2*DX(dim)); funEvals = funEvals + 2;
+        end
+    elseif strcmpi(method,"Complex-Step") == true
+        dx = 1e-14;
+        DX(dim) = x0(dim) * dx + eps;
+        % Central Difference Approximation
+        if singleOutput == true
+            g(dim) = imag(fun(x0+(1i*DX)))./DX(dim); funEvals = funEvals + 1;
+        elseif singleOutput == false
+            g = g + imag(fun(x0+(1i*DX)))./(DX(dim)); funEvals = funEvals + 1;
+        end
     end
 end
 end

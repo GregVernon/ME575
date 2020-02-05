@@ -2,7 +2,7 @@ function [x,fval,nl_res,iter,funEvals] = BFGS(fun,x0,NameValueArgs)
 arguments
     fun
     x0
-    NameValueArgs.gradFun = "Centered Finite Difference";
+    NameValueArgs.gradFun = "Centered-Difference";
     NameValueArgs.nl_tol = 1e-8;
     NameValueArgs.max_iter = 1e3;
 end
@@ -22,13 +22,13 @@ x = x0;
 iter = 0;
 nl_res = inf;
 isStagnated = false;
-while nl_res > nl_tol && iter <= max_iter && isStagnated == false
+while nl_res(iter+1) > nl_tol && iter <= max_iter && isStagnated == false
     iter = iter + 1;
     if iter == 1
-        if strcmpi(gradFun, "Centered Finite Difference") == true
+        if strcmpi(gradFun, "Centered-Difference") == true || strcmpi(gradFun, "Complex-Step")
             fval = fun(x0);
             fval_last = fval;
-            [Gk,funEvals] = computeGradient_FDM(fun,x,funEvals);
+            [Gk,funEvals] = computeGradient_FDM(fun,x,gradFun,funEvals);
         elseif strcmpi(class(gradFun), "function_handle") == true
             fval = fun(x0);
             fval_last = fval;
@@ -41,6 +41,7 @@ while nl_res > nl_tol && iter <= max_iter && isStagnated == false
         elseif strcmpi(gradFun,"integrated") == true
             [fval_last,Gk] = fun(x0);
         end
+        nl_res(iter) = norm(Gk,2);
         Vk = I;
     end
     searchDirection = -Vk * Gk;
@@ -62,9 +63,9 @@ while nl_res > nl_tol && iter <= max_iter && isStagnated == false
     end
     sk = stepSize * searchDirection;
     x_next = sk + x;
-    if strcmpi(gradFun, "Centered Finite Difference") == true
+    if strcmpi(gradFun, "Centered-Difference") == true || strcmpi(gradFun, "Complex-Step")
         fval = fun(x_next);
-        [Gk_next,funEvals] = computeGradient_FDM(fun,x_next,funEvals);
+        [Gk_next,funEvals] = computeGradient_FDM(fun,x_next,gradFun,funEvals);
     elseif strcmpi(class(gradFun), "function_handle") == true
         fval = fun(x_next);
         if nargin(gradFun) == 1
@@ -85,14 +86,17 @@ while nl_res > nl_tol && iter <= max_iter && isStagnated == false
     x = x_next;
     Gk = Gk_next;
     Vk = Vk_next;
-    nl_res = norm(Gk,2);
+    nl_res(iter+1) = norm(Gk,inf);
     isStagnated = any(isnan(Vk(:)));
+    if isStagnated
+        disp("Solution Stagnated")
+    end
 end
 
 
 end
 
-function [g,funEvals] = computeGradient_FDM(fun,x0, funEvals)
+function [g,funEvals] = computeGradient_FDM(fun, x0, method, funEvals)
 % Test if function returns 1 or multiple results
 if length(fun(x0)) == 1
     singleOutput = true;
@@ -100,15 +104,26 @@ else
     singleOutput = false;
 end
 g = zeros(length(x0),1);
-dx = 1e-14;
 for dim = 1:length(x0)
     DX = zeros(length(x0),1);
-    DX(dim) = 1i * (x0(dim) * dx + eps);
-    % Central Difference Approximation
-    if singleOutput == true
-        g(dim) = (fun(x0+DX) - fun(x0-DX))./(2*DX(dim)); funEvals = funEvals + 2;
-    elseif singleOutput == false
-        g = g + (fun(x0+DX) - fun(x0-DX))./(2*DX(dim)); funEvals = funEvals + 2;
+    if strcmpi(method,"Centered-Difference") == true
+        dx = 1e-8;
+        DX(dim) = x0(dim) * dx + eps;
+        % Central Difference Approximation
+        if singleOutput == true
+            g(dim) = (fun(x0+DX) - fun(x0-DX))./(2*DX(dim)); funEvals = funEvals + 2;
+        elseif singleOutput == false
+            g = g + (fun(x0+DX) - fun(x0-DX))./(2*DX(dim)); funEvals = funEvals + 2;
+        end
+    elseif strcmpi(method,"Complex-Step") == true
+        dx = 1e-14;
+        DX(dim) = x0(dim) * dx + eps;
+        % Central Difference Approximation
+        if singleOutput == true
+            g(dim) = imag(fun(x0+(1i*DX)))./DX(dim); funEvals = funEvals + 1;
+        elseif singleOutput == false
+            g = g + imag(fun(x0+(1i*DX)))./(DX(dim)); funEvals = funEvals + 1;
+        end
     end
 end
 end
