@@ -139,7 +139,7 @@ x0 = sort(linspace(0,1,128),"descend");
 % Integrated Gradient
 gfun = "Integrated";
 [x,fopt,res,iter,funEvals] = BFGS(fun,x0,"gradFun",gfun,"nl_tol",1e-4,"max_iter",1e4);
-disp("Integrated -- " + "# Iterations = " + num2str(iter) + " # funEvals = " + num2str(funEvals) + " Residual = " + num2str(res(end)) + " Residual = " + num2str(res(end)))
+disp("Integrated -- " + "# Iterations = " + num2str(iter) + " # funEvals = " + num2str(funEvals) + " Residual = " + num2str(res(end)))
 % Centered-Difference
 gfun = "Centered-Difference";
 [x,fopt,res,iter,funEvals] = BFGS(fun,x0,"gradFun",gfun,"nl_tol",1e-4,"max_iter",1e4);
