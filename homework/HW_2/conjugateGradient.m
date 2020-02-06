@@ -1,4 +1,4 @@
-function [x,nl_res,iter,funEvals] = conjugateGradient(fun,x0,NameValueArgs)
+function [x,fval,nl_res,iter,funEvals] = conjugateGradient(fun,x0,NameValueArgs)
 arguments
     fun
     x0
@@ -40,6 +40,12 @@ while iter <= max_iter
         [fval,Gk] = fun(x); funEvals = funEvals + 1;
     end
     
+    % Check to see if we're converged at the current x-value
+    nl_res(iter) = norm(Gk,2);
+    if nl_res(iter) <= nl_tol
+        return
+    end
+    
     if iter == 1
         % Do Steepest Descent
         fval_last = fval;
@@ -60,13 +66,7 @@ while iter <= max_iter
         end
         Pk = -Gk + Bk * Pk_last;
         % Compute Initial Step Size
-        stepSize = 1; %stepSize_last * (transpose(Gk_last) * Pk_last) / (transpose(Gk) * Pk);
-    end
-    
-    % Check to see if we're converged at the current x-value
-    nl_res = norm(Gk,inf);
-    if nl_res <= nl_tol
-        return
+        stepSize = 1;
     end
     
     % Sufficient decrease

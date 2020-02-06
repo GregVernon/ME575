@@ -21,8 +21,7 @@ funEvals = 0;
 x = x0;
 iter = 0;
 nl_res = inf;
-isStagnated = false;
-while nl_res(iter+1) > nl_tol && iter <= max_iter && isStagnated == false
+while iter <= max_iter
     iter = iter + 1;
     if iter == 1
         if strcmpi(gradFun, "Centered-Difference") == true || strcmpi(gradFun, "Complex-Step")
@@ -77,20 +76,30 @@ while nl_res(iter+1) > nl_tol && iter <= max_iter && isStagnated == false
     elseif strcmpi(gradFun,"integrated") == true
         [fval,Gk] = fun(x0);
     end
+    
+    nl_res(iter+1) = norm(Gk_next,inf);
+    if nl_res(iter+1) <= nl_tol
+        return
+    end
+    
     yk = Gk_next - Gk;
+    isStagnated = all(yk==0);
+    if isStagnated
+        disp("Solution Stagnated")
+        return
+    end
     
     Vk_next = [I - (sk*transpose(yk))/(transpose(sk)*yk)] * Vk * [I - (yk * transpose(sk))/(transpose(sk)*yk)] + (sk*transpose(sk)) / (transpose(sk) * yk);
-    
+    isStagnated = any(isnan(Vk(:)));
+    if isStagnated
+        disp("Solution Stagnated")
+        return
+    end
     
     fval_last = fval;
     x = x_next;
     Gk = Gk_next;
     Vk = Vk_next;
-    nl_res(iter+1) = norm(Gk,inf);
-    isStagnated = any(isnan(Vk(:)));
-    if isStagnated
-        disp("Solution Stagnated")
-    end
 end
 
 
