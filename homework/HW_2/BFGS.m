@@ -11,7 +11,7 @@ gradFun = NameValueArgs.gradFun;
 nl_tol = NameValueArgs.nl_tol;
 max_iter = NameValueArgs.max_iter;
 ndof = length(x0);
-I = eye(ndof);
+I = speye(ndof);
 
 if contains(class(gradFun),"sym")
     gradFun = matlabFunction(gradFun);
@@ -73,8 +73,8 @@ while iter <= max_iter
             X = num2cell(x_next);
             Gk_next = gradFun(X{:});
         end
-    elseif strcmpi(gradFun,"integrated") == true
-        [fval,Gk] = fun(x0);
+    elseif strcmpi(gradFun,"Integrated") == true
+        [fval,Gk_next] = fun(x_next);
     end
     
     nl_res(iter+1) = norm(Gk_next,inf);
@@ -89,7 +89,8 @@ while iter <= max_iter
         return
     end
     
-    Vk_next = [I - (sk*transpose(yk))/(transpose(sk)*yk)] * Vk * [I - (yk * transpose(sk))/(transpose(sk)*yk)] + (sk*transpose(sk)) / (transpose(sk) * yk);
+    Vk_next = [I - sparse((sk*transpose(yk))/(transpose(sk)*yk))] * Vk * [I - sparse((yk * transpose(sk))/(transpose(sk)*yk))] + sparse((sk*transpose(sk)) / (transpose(sk) * yk));
+    
     isStagnated = any(isnan(Vk(:)));
     if isStagnated
         disp("Solution Stagnated")
