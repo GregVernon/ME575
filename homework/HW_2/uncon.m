@@ -48,4 +48,8 @@ elseif strcmpi(method,"fminunc")
     iter = output.iterations;
     funEvals = output.funcCount;
 end
+
+outputs.res = res;
+outputs.iter = iter;
+outputs.funEvals = funEvals;
 end
