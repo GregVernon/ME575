@@ -41,7 +41,7 @@ while iter <= max_iter
     end
     
     % Check to see if we're converged at the current x-value
-    nl_res(iter) = norm(Gk,2);
+    nl_res(iter) = norm(Gk,inf);
     if nl_res(iter) <= nl_tol
         return
     end
