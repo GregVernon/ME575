@@ -63,10 +63,10 @@ while iter <= max_iter
     sk = stepSize * searchDirection;
     x_next = sk + x;
     if strcmpi(gradFun, "Centered-Difference") == true || strcmpi(gradFun, "Complex-Step")
-        fval = fun(x_next);
+        fval = fun(x_next); funEvals = funEvals + 1;
         [Gk_next,funEvals] = computeGradient_FDM(fun,x_next,gradFun,funEvals);
     elseif strcmpi(class(gradFun), "function_handle") == true
-        fval = fun(x_next);
+        fval = fun(x_next); funEvals = funEvals + 1;
         if nargin(gradFun) == 1
             Gk_next = gradFun(x_next);
         elseif nargin(gradFun) > 1
@@ -74,7 +74,7 @@ while iter <= max_iter
             Gk_next = gradFun(X{:});
         end
     elseif strcmpi(gradFun,"Integrated") == true
-        [fval,Gk_next] = fun(x_next);
+        [fval,Gk_next] = fun(x_next); funEvals = funEvals + 1;
     end
     
     nl_res(iter+1) = norm(Gk_next,inf);
@@ -83,7 +83,7 @@ while iter <= max_iter
     end
     
     yk = Gk_next - Gk;
-    isStagnated = all(yk==0);
+    isStagnated = norm(yk,inf) <= eps;
     if isStagnated
         disp("Solution Stagnated")
         return
@@ -113,6 +113,8 @@ if length(fun(x0)) == 1
 else
     singleOutput = false;
 end
+funEvals = funEvals + 1;
+ 
 g = zeros(length(x0),1);
 for dim = 1:length(x0)
     DX = zeros(length(x0),1);

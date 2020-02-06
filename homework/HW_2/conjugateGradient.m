@@ -106,6 +106,8 @@ if length(fun(x0)) == 1
 else
     singleOutput = false;
 end
+funEvals = funEvals + 1;
+ 
 g = zeros(length(x0),1);
 for dim = 1:length(x0)
     DX = zeros(length(x0),1);
