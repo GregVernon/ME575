@@ -31,17 +31,18 @@ outputs : struct
 
 if nargin == 3  % means no options were passed in
     % set defaults here for how you want me to run it. 
-    method = "BFGS";
+    method = "BFGS"; % CG % fminunc
     gradFun = "Integrated"; % Complex-Step % Centered-Difference
+    max_iter = 1e4;
 end
 
 if strcmpi(method,"CG")
-    [xopt,fopt,res,iter,funEvals] = conjugateGradient(func,x0,"gradFun",gradFun,"nl_tol",epsilon_g,"max_iter",1e4);
+    [xopt,fopt,res,iter,funEvals] = conjugateGradient(func,x0,"gradFun",gradFun,"nl_tol",epsilon_g,"max_iter",max_iter);
 elseif strcmpi(method,"BFGS")
-    [xopt,fopt,res,iter,funEvals] = BFGS(func,x0,"gradFun",gradFun,"nl_tol",epsilon_g,"max_iter",1e4);
+    [xopt,fopt,res,iter,funEvals] = BFGS(func,x0,"gradFun",gradFun,"nl_tol",epsilon_g,"max_iter",max_iter);
 elseif strcmpi(method,"fminunc")
     options = optimoptions("fminunc");
-    options.MaxIterations = 400;
+    options.MaxIterations = max_iter;
     options.OptimalityTolerance = epsilon_g;
     [xopt,fopt,~,output] = fminunc(func,x0,options);
     res = output.firstorderopt;
