@@ -1,0 +1,20 @@
+
+create surface circle radius 1 zplane
+sideset 1 add curve 1  
+sideset 1 name "Boundary"
+create vertex location on surface 1 at location 0 0 0   
+create vertex location on surface 1 at location 0.25 0.25 0 
+create vertex location on surface 1 at location -0.25 0.25 0 
+create vertex location on surface 1 at location -0.25 -0.25 0 
+create vertex location on surface 1 at location 0.25 -0.25 0 
+
+imprint volume all with vertex 2 3 4 5 6
+
+mesh surf all
+
+imprint mesh onto body all 
+stitch body all
+compress
+build uspline body 1 p 2 c 1 domain solid draw show_continuity 
+
+save trelis "C:/Users/gregj/Documents/GitHub/ME575/eigen/src/testCircle.trelis" overwrite journal
