@@ -1,4 +1,4 @@
-function [mass, gradMass, stress] = truss(A,gradMethod)
+function [mass, stress] = truss(A)
 %{
 Computes mass and stress for the 10-bar truss structure
 
@@ -42,28 +42,9 @@ nbar = length(A);  % number of bars
 
 % compute mass
 if iscolumn(A)
-    A = A';
+    A = transpose(A);
 end
 mass = sum(rho.*A.*L);
-if exist("gradMethod","var")
-    if     strcmpi(gradMethod, "Forward-Difference")
-        dx = 1e-6 * norm(A,inf);
-        mass_0 = rho.*A.*L;
-        mass_1 = rho.*(A+dx).*L;
-        gradMass = (mass_1 - mass_0) / dx;
-    elseif strcmpi(gradMethod, "Centered-Difference")
-        dx = 1e-8 * norm(A,inf);
-        mass_1 = rho.*(A+dx).*L;
-        mass_2 = rho.*(A-dx).*L;
-        gradMass = (mass_1 - mass_2) / (2*dx);
-    elseif strcmpi(gradMethod, "Complex-Step")
-        dx = 1e-16 * 1i;
-        mass_1 = rho.*(A+dx).*L;
-        gradMass = imag(mass_1) / imag(dx);
-    end
-else
-    gradMass = [];
-end
 
 % assemble global matricies
 K = zeros(DOF*n, DOF*n);
