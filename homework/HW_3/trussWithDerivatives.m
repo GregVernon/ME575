@@ -7,8 +7,10 @@ function [mass,gradMass,stress] = trussWithDerivatives(area,gradMethod)
 if exist("gradMethod","var")
     if strcmpi(gradMethod, "Auto-Diff")
         x = amatinit(area);
-        [m,s] = trussAutoDiff(x);
+        [m,~] = trussAutoDiff(x);
         gradMass = ajac(transpose(m),0);
+    elseif strcmpi(gradMethod,"Adjoint")
+        [~,gradMass,~] = trussAdjoint(area);
     else
         gradMass = zeros(length(area),1);
         for ii = 1:length(area)
