@@ -1,4 +1,4 @@
-function [mass, DF, stress] = trussAdjoint(A)
+function [mass, DF, stress, DG] = trussAdjoint(A)
 %{
 Computes mass and stress for the 10-bar truss structure
 
@@ -45,6 +45,7 @@ if iscolumn(A)
     A = transpose(A);
 end
 mass = sum(rho.*A.*L);
+DF = rho .* L;
 
 % assemble global matricies
 K = zeros(DOF*n, DOF*n);
@@ -64,6 +65,7 @@ end
 
 for ii = 1:length(A)
     for jj = 1:nbar
+        [Ksub, dKdAsub, Ssub] = bar(E(jj), A(jj), L(jj), phi(jj));
         idx = node2idx([start(jj), finish(jj)], DOF);  % pass in the starting and ending node number for this element
         dKdA(idx,idx,ii) = dKdA(idx,idx,ii) + dKdAsub;
     end
@@ -102,15 +104,28 @@ d = K\F;
 stress = S*d;
 
 % Compute Adjoint Derivative
+% dFdx = zeros(length(A),1);
+% dFdy = S;
+% dRdy = K;
+% for ii = 1:size(dKdA,3)
+%     for jj = 1:length(stress)
+%         dRdx = dKdA(:,:,ii) * d;
+%         ADJ = dFdy(jj,:) / dRdy; 
+%         DG(ii,jj) = - ADJ * dRdx;
+%     end
+% end
+
 dFdx = zeros(length(A),1);
 dFdy = S;
-dRdx = zeros(size(dKdA,1),size(dKdA,2));
-for ii = 1:size(dKdA,3)
-    dRdx = dKdA(:,:,ii) * d;
-end
 dRdy = K;
-ADJ = transpose(transpose(dRdy) \ transpose(dFdy));
-DF = dFdx - ADJ * dRdx;
+for ii = 1:size(dKdA,3)
+    ADJ(ii,:) = transpose(K) \ transpose(S(ii,:)); %dFdy(jj,:) / dRdy; 
+end
+
+for ii = 1:length(stress)
+    dRdx = dKdA(:,:,ii) * d;
+    DG(:,ii) = - ADJ * dRdx;
+end
 
 end
 
@@ -151,10 +166,10 @@ k0 = [c^2 c*s;
     c*s s^2];
 
 K = E*A/L*[ k0 -k0;
-           -k0  k0];
+    -k0  k0];
 
 dKdA = E/L*[ k0 -k0;
-            -k0  k0];
+    -k0  k0];
 
 % stress matrix
 S = E/L*[-c -s c s];

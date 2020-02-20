@@ -5,11 +5,13 @@ function [conINEQ,conEQ,gradConINEQ,gradConEQ] = stressConstraintWithDerivatives
 
 % Compute constraint derivatives at current configuration
 if exist('gradMethod','var')
-    if strcmpi(gradMethod,"Auto-Diff") || strcmpi(gradMethod,"Adjoint")
+    if strcmpi(gradMethod,"Auto-Diff")
         x = amatinit(area);
         [conINEQ_tmp,conEQ_tmp] = stressConstraintAutoDiff(x);
         gradConINEQ = transpose(ajac(conINEQ_tmp,0));
-        gradConEQ = []        
+        gradConEQ = [];
+    elseif strcmpi(gradMethod,"Adjoint")
+        [ConINEQ,ConEQ,gradConINEQ,gradConEQ] = stressConstraintAdjoint(area);        
     else
         gradConINEQ = zeros(length(area),length(conINEQ));
         for ii = 1:length(area)
