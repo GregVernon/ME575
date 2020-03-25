@@ -1,0 +1,285 @@
+% This LaTeX was auto-generated from MATLAB code.
+% To make changes, update the MATLAB code and export to LaTeX again.
+
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{epstopdf}
+\usepackage[table]{xcolor}
+\usepackage{matlab}
+
+\sloppy
+\epstopdfsetup{outdir=./}
+\graphicspath{ {./custom_results_images/} }
+
+\begin{document}
+
+\matlabtitle{Basic constrained gradient-based optimization}
+
+\begin{matlabcode}
+clear
+x0 = rand(1,3);
+penalty = 2.^[10:20];
+for ii = 1:length(penalty)
+    disp("Penalty = " + num2str(penalty(ii)))
+    options = optimoptions("fminunc","Display","iter-detailed");
+    objFun = @(x) computeLagrangian(x, penalty(ii));
+    solVector = fminunc(objFun, x0, options);
+    x0 = solVector;
+    disp("    Unconstrained solution: ")
+    disp("r_1 = " + num2str(solVector(1)) + " || r_2 = " + num2str(solVector(2)) + " || theta = " + num2str(pi * solVector(3)))
+    disp(join(repelem("%",36),""))
+end
+\end{matlabcode}
+\begin{matlaboutput}
+Penalty = 1024
+                                                        First-order 
+ Iteration  Func-count       f(x)        Step-size       optimality
+     0           4         -65.1852                          29.3
+     1          16         -111.397      0.0240597             96  
+     2          24         -113.411       0.141799            121  
+     3          32         -127.652       0.293309            137  
+     4          36         -143.254              1           22.1  
+     5          40         -143.681              1           7.75  
+     6          44         -143.744              1            4.9  
+     7          48         -143.757              1          0.354  
+     8          52         -143.757              1         0.0489  
+     9          56         -143.757              1       0.000862  
+    10          60         -143.757              1       3.43e-05  
+    11          64         -143.757              1       1.91e-06  
+
+Optimization completed: The first-order optimality measure, 6.304107e-08, is less 
+than options.OptimalityTolerance = 1.000000e-06.
+    Unconstrained solution: 
+r_1 = 0.044311 || r_2 = 0.3357 || theta = 3.321
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Penalty = 2048
+                                                        First-order 
+ Iteration  Func-count       f(x)        Step-size       optimality
+     0           4           -140.5                          58.5
+     1          16         -141.543    0.000761932           37.6  
+     2          20         -142.128              1           6.97  
+     3          24          -142.15              1            5.8  
+     4          28         -142.208              1           1.08  
+     5          32         -142.209              1          0.157  
+     6          36         -142.209              1       0.000833  
+     7          40         -142.209              1       2.67e-05  
+
+Optimization completed: The first-order optimality measure, 4.489332e-07, is less 
+than options.OptimalityTolerance = 1.000000e-06.
+    Unconstrained solution: 
+r_1 = 0.074277 || r_2 = 0.30852 || theta = 3.2284
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Penalty = 4096
+                                                        First-order 
+ Iteration  Func-count       f(x)        Step-size       optimality
+     0           4         -140.749                          56.6
+     1          20         -141.468    0.000225392           4.49  
+     2          24         -141.476              1              4  
+     3          28         -141.482              1           3.56  
+     4          32         -141.496              1           4.39  
+     5          36         -141.502              1           2.97  
+     6          40         -141.504              1          0.746  
+     7          44         -141.504              1         0.0622  
+     8          48         -141.504              1        0.00258  
+     9          52         -141.504              1       0.000263  
+    10          56         -141.504              1       5.72e-06  
+
+Optimization completed: The first-order optimality measure, 9.932087e-08, is less 
+than options.OptimalityTolerance = 1.000000e-06.
+    Unconstrained solution: 
+r_1 = 0.087709 || r_2 = 0.29343 || theta = 3.1838
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Penalty = 8192
+                                                        First-order 
+ Iteration  Func-count       f(x)        Step-size       optimality
+     0           4         -140.825                            55
+     1          20         -140.994    0.000207343           39.6  
+     2          24         -141.163              1           2.12  
+     3          32         -141.168             10           1.37  
+     4          36         -141.171              1          0.138  
+     5          40         -141.171              1        0.00661  
+     6          44         -141.171              1       5.72e-06  
+
+Optimization completed: The first-order optimality measure, 1.021538e-07, is less 
+than options.OptimalityTolerance = 1.000000e-06.
+    Unconstrained solution: 
+r_1 = 0.094001 || r_2 = 0.28559 || theta = 3.1623
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Penalty = 16384
+                                                        First-order 
+ Iteration  Func-count       f(x)        Step-size       optimality
+     0           4         -140.846                            54
+     1          24         -141.006    5.35499e-05           6.32  
+     2          28         -141.008              1           1.09  
+     3          36         -141.009             10          0.971  
+     4          40          -141.01              1           1.41  
+     5          44          -141.01              1           0.47  
+     6          48          -141.01              1         0.0444  
+     7          52          -141.01              1       0.000781  
+     8          56          -141.01              1       6.48e-05  
+     9          60          -141.01              1        7.6e-06  
+
+Optimization completed: The first-order optimality measure, 1.381475e-07, is less 
+than options.OptimalityTolerance = 1.000000e-06.
+    Unconstrained solution: 
+r_1 = 0.097037 || r_2 = 0.28162 || theta = 3.1519
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Penalty = 32768
+                                                        First-order 
+ Iteration  Func-count       f(x)        Step-size       optimality
+     0           4         -140.851                          53.5
+     1          24         -140.929    3.50041e-05           8.07  
+     2          28          -140.93              1           0.55  
+     3          36         -140.931             10          0.501  
+     4          40         -140.931              1          0.455  
+     5          44         -140.931              1          0.091  
+     6          48         -140.931              1        0.00129  
+     7          52         -140.931              1       1.34e-05  
+
+Optimization completed: The first-order optimality measure, 2.448790e-07, is less 
+than options.OptimalityTolerance = 1.000000e-06.
+    Unconstrained solution: 
+r_1 = 0.098528 || r_2 = 0.27963 || theta = 3.1467
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Penalty = 65536
+                                                        First-order 
+ Iteration  Func-count       f(x)        Step-size       optimality
+     0           4         -140.852                          53.3
+     1          28         -140.892    1.52483e-05          0.278  
+     2          36         -140.892         9.7221          0.481  
+     3          40         -140.892              1           0.68  
+     4          44         -140.892              1           1.09  
+     5          48         -140.892              1          0.584  
+     6          52         -140.892              1         0.0866  
+     7          56         -140.892              1        0.00422  
+     8          60         -140.892              1       0.000263  
+     9          64         -140.892              1       1.91e-05  
+
+Optimization completed: The first-order optimality measure, 3.512949e-07, is less 
+than options.OptimalityTolerance = 1.000000e-06.
+    Unconstrained solution: 
+r_1 = 0.099266 || r_2 = 0.27863 || theta = 3.1441
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Penalty = 131072
+                                                        First-order 
+ Iteration  Func-count       f(x)        Step-size       optimality
+     0           4         -140.853                          53.1
+     1          28         -140.872    6.82629e-06           5.55  
+     2          32         -140.872              1          0.139  
+     3          44         -140.872             91          0.173  
+     4          48         -140.872              1          0.107  
+     5          52         -140.872              1         0.0122  
+     6          56         -140.872              1       4.96e-05  
+
+Optimization completed: The first-order optimality measure, 9.164427e-07, is less 
+than options.OptimalityTolerance = 1.000000e-06.
+    Unconstrained solution: 
+r_1 = 0.099634 || r_2 = 0.27813 || theta = 3.1429
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Penalty = 262144
+                                                        First-order 
+ Iteration  Func-count       f(x)        Step-size       optimality
+     0           4         -140.853                            53
+     1          28         -140.862     4.7281e-06           12.7  
+     2          32         -140.862              1         0.0694  
+     3          48         -140.862            820          0.173  
+     4          52         -140.862              1        0.00304  
+     5          56         -140.862              1       1.53e-05  
+
+Optimization completed: The first-order optimality measure, 2.822893e-07, is less 
+than options.OptimalityTolerance = 1.000000e-06.
+    Unconstrained solution: 
+r_1 = 0.099817 || r_2 = 0.27788 || theta = 3.1422
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Penalty = 524288
+                                                        First-order 
+ Iteration  Func-count       f(x)        Step-size       optimality
+     0           4         -140.853                            53
+     1          32         -140.858    1.85698e-06           1.39  
+     2          36         -140.858              1         0.0347  
+     3          52         -140.858            820          0.389  
+     4          56         -140.858              1          0.213  
+     5          60         -140.858              1         0.0131  
+     6          64         -140.858              1       0.000643  
+
+Optimization stopped because the norm of the current step, 3.588200e-07, is
+less than options.StepTolerance = 1.000000e-06.
+    Unconstrained solution: 
+r_1 = 0.099909 || r_2 = 0.27775 || theta = 3.1419
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Penalty = 1048576
+                                                        First-order 
+ Iteration  Func-count       f(x)        Step-size       optimality
+     0           4         -140.853                            53
+     1          32         -140.855    8.78939e-07           4.15  
+     2          36         -140.855              1         0.0173  
+     3          52         -140.855            820         0.0322  
+     4          56         -140.855              1          0.005  
+     5          60         -140.855              1       0.000158  
+
+Optimization stopped because the norm of the current step, 5.496499e-08, is
+less than options.StepTolerance = 1.000000e-06.
+    Unconstrained solution: 
+r_1 = 0.099954 || r_2 = 0.27769 || theta = 3.1418
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{matlaboutput}
+
+
+\matlabheading{Function definitions}
+
+\matlabheadingtwo{Lagrangian evaluation}
+
+\begin{matlabcode}
+function LAG = computeLagrangian(x, penalty)
+r1 = x(1);
+r2 = x(2);
+theta = x(3);
+
+f = -1*computeFreq(r1, r2, pi*theta);
+g = constraintFunctions(r1, r2, theta);
+
+LAG_F = f;
+LAG_G = sum(g.^2);
+LAG = LAG_F + penalty/2 * LAG_G;
+end
+\end{matlabcode}
+
+\matlabheadingtwo{Function evaluation (additive inverse is objective function)}
+
+\begin{matlabcode}
+function freq = computeFreq(r1,r2,theta)
+    %surface fit for frequency on radial disk with 2 supports
+    %r1 refers to the distance from center of the first support (0.1 - 0.9)
+    %r2 is the distance from center to the second support (0.1 - 0.9)
+    %theta is the angle between the supports (from center) (0 - pi)
+    freq = (140.93-r1*25)+(-7.458*r1+9.1185)*theta+(-170)*r2+ ...
+           (5.783*r1-10.367)*theta^2+(-8.1)*theta*r2+(117)*r2^2+ ...
+           (4.2)*theta^3+(-28.075*r1+31.5125)*theta^2*r2+(15.63*r1-2.26)*theta*r2^2+ ...
+           (-.7)*theta^4+(-.35)*theta^3*r2+(21.77*r1-27.862)*theta^2*r2^2;
+end
+\end{matlabcode}
+
+\matlabheadingtwo{Constraint functions}
+
+\begin{matlabcode}
+function g = constraintFunctions(r1, r2, theta)
+    g(1) = max(0, r1 - 0.9); % Radius < 0.9
+    g(2) = max(0, r2 - 0.9); % Radius < 0.9
+    g(3) = max(0, 0.1 - r1); % Radius > 0.1
+    g(4) = max(0, 0.1 - r2); % Radius > 0.1
+    g(5) = max(0, 0.1 - sqrt(r1^2 + r2^2 - 2*r1*r2*cos(pi*theta))); % Minimum distance between pins
+    g(6) = max(0, -theta); % Theta > 0
+    g(7) = max(0, theta - 1); % Theta < 1*pi
+end
+\end{matlabcode}
+
+\end{document}

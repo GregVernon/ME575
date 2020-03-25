@@ -124,7 +124,7 @@ end
 
 for ii = 1:length(stress)
     dRdx = dKdA(:,:,ii) * d;
-    DG(:,ii) = - ADJ * dRdx;
+    DG(ii,:) = - ADJ * dRdx;
 end
 
 end

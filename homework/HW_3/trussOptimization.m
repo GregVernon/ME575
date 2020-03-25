@@ -39,7 +39,7 @@ else
     elseif strcmpi(gradMethod,"COMPLEX-STEP")
         % Complex Step
         disp("COMPLEX-STEP")
-        options.CheckGradients = false;
+        options.CheckGradients = true;
         [AREA,fval,exitflag,output,lambda] = fmincon(@(A)trussWithDerivatives(A,gradMethod),x0,[],[],[],[],minArea,[],@(A)stressConstraintWithDerivatives(A,gradMethod),options);
         
     elseif strcmpi(gradMethod,"AUTO-DIFF")
